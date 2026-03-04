@@ -123,17 +123,19 @@ setInterval(nextSlide, 4000);
 /* START EXPERIENCE */
 function startExperience() {
   const music = document.getElementById("music");
-  music.play().catch(()=>{});
 
-  if (document.documentElement.requestFullscreen) {
-    document.documentElement.requestFullscreen();
+  // Play audio
+  music.play().catch(() => {});
+
+  const elem = document.documentElement;
+
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen().catch(()=>{});
+  } else if (elem.webkitRequestFullscreen) { // Safari
+    elem.webkitRequestFullscreen();
   }
 
   document.getElementById("startScreen").style.display = "none";
-}
-
-document.getElementById("startScreen")
-  .addEventListener("pointerdown", startExperience, { once: true });
 
 /* FIREWORKS SYSTEM */
 const canvas = document.getElementById("fireworks");
@@ -192,3 +194,4 @@ animate();
 </body>
 
 </html>
+
