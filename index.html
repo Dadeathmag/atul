@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday 🎉🔥</title>
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  background: black;
+  font-family: sans-serif;
+}
+
+/* Start screen */
+#startScreen {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  z-index: 100;
+  cursor: pointer;
+}
+
+/* Slideshow container */
+#slideshowContainer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  animation: shakePulseLoop 3s infinite ease-in-out;
+  z-index: 1;
+}
+
+/* Slides */
+.slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+.active {
+  opacity: 1;
+}
+
+/* Fire */
+.fire {
+  position: absolute;
+  opacity: 0.6;
+  bottom: 0;
+  width: 100%;
+  height: 180px; 
+  background: linear-gradient(to top, orange, red, transparent);
+  animation: fireMove 0.2s infinite alternate;
+  z-index: 3;
+}
+
+/* Fireworks canvas */
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Shake + Pulse */
+@keyframes shakePulseLoop {
+  0%   { transform: scale(1) translate(0,0); }
+  25%  { transform: scale(1.05) translate(-5px,3px); }
+  50%  { transform: scale(1.08) translate(5px,-3px); }
+  75%  { transform: scale(1.04) translate(-3px,2px); }
+  100% { transform: scale(1) translate(0,0); }
+}
+
+@keyframes fireMove {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(1.12); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="startScreen">click</div>
+
+<div id="slideshowContainer">
+  <img src="img1.jpg" class="slide active">
+  <img src="img2.jpg" class="slide">
+  <img src="img3.jpg" class="slide">
+  <img src="img4.jpg" class="slide">
+</div>
+
+<div class="fire"></div>
+<canvas id="fireworks"></canvas>
+<audio id="music" src="audio.mp3" loop></audio>
+
+<script>
+/* SLIDESHOW LOOP */
+const slides = document.querySelectorAll(".slide");
+let index = 0;
+
+function nextSlide() {
+  slides[index].classList.remove("active");
+  index = (index + 1) % slides.length; // LOOP forever
+  slides[index].classList.add("active");
+}
+
+setInterval(nextSlide, 4000);
+
+/* START EXPERIENCE */
+function startExperience() {
+  const music = document.getElementById("music");
+  music.play().catch(()=>{});
+
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen();
+  }
+
+  document.getElementById("startScreen").style.display = "none";
+}
+
+document.getElementById("startScreen")
+  .addEventListener("pointerdown", startExperience, { once: true });
+
+/* FIREWORKS SYSTEM */
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+let particles = [];
+
+function createFirework() {
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * canvas.height / 2;
+
+  for (let i = 0; i < 90; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      radius: 2,
+      color: `hsl(${Math.random()*360},100%,50%)`,
+      speedX: (Math.random() - 0.5) * 7,
+      speedY: (Math.random() - 0.5) * 7,
+      life: 100
+    });
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, i) => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.life--;
+
+    if (p.life <= 0) particles.splice(i, 1);
+  });
+
+  requestAnimationFrame(animate);
+}
+
+setInterval(createFirework, 800);
+animate();
+</script>
+
+</body>
+</html>
